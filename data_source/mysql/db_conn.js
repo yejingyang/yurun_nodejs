@@ -42,36 +42,43 @@ var db_conn_info = {
 //var inserts = [columns, 'id', userId];
 //sql = mysql.format(sql, inserts);
 
-var columns = ['user', 'cook'];
-var tab = 'tab_name';
-var condition = {
-    'name' : 'yang',
-    'fuck' : 'yeshhhh'
-};
-var sql = "select ?? from ?? where ";
-//var inserts = [columns, tab, 'yang'];
-var inserts = ['yang', tab];
-sql = mysql.format(sql, inserts);
-
-var con = "?"
-
-sql += "yang";
-
+//var columns = ['user', 'cook'];
+//var tab = 'tab_name';
+//var condition = {
+//    'name' : 'yang',
+//    'fuck' : 'yeshhhh'
+//};
+//var sql = "select ?? from ?? where ";
+////var inserts = [columns, tab, 'yang'];
+//var inserts = ['yang', tab];
+//sql = mysql.format(sql, inserts);
 //
+//var con = "?"
+//
+//sql += "yang";
+
+
 //var post  = {id: 1, title: 'Hello MySQL'};
-////var sql = "insert into post set ?";
+//var sql = "insert into post set ?";
 //var sql = "update ?? set ? where ??";
 //var tab = 'tabname';
-////var con = {id:1}
-//var con = ['yang', 'funck']
-//upds = [tab, post, con];
+//var con = {id:1}
+//var con = 'yang';
+//upds = [tab, post, con]; /
 //sql = mysql.format(sql, upds);
 
+//var post  = {id: 1};
+//var sql = "?";
+//sql = mysql.format(sql, post);
+//sql.replace(',', 'and');
+//sql = sql.split(',').join(' and ');
 
 
+//console.log(post.count);
 
-console.log('sql is below:');
-console.log(sql);
+
+//console.log('sql is below:');
+//console.log(sql);
 
 connect();
 

@@ -9,7 +9,7 @@ var user = require('./routes/user');
 var http = require('http');
 var path = require('path');
 
-var worker = require('./routes/worker')
+var worker = require('./routes/t_worker')
 
 var app = express();
 
@@ -33,6 +33,7 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 
 app.get('/worker', worker.get);
+app.get('/del', worker.delete);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

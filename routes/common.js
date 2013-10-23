@@ -6,4 +6,230 @@
  * To change this template use File | Settings | File Templates.
  */
 
+var err_code = resuire('./errors');
+var db = resuire('../data_source/mysql/db_common');
+var types = resuire('./types');
 
+
+/**
+ * format the return values
+ * @param _errcode  [error code]
+ * @param _ret  [return value]
+ * @param _data [useful data]
+ * @returns {{errcode: *, msg: *, ret: *}|{errcode: *, msg: *, ret: *, data: *}}
+ */
+exports.res_format = function resFormat(_errcode, _ret, _data){
+    if(undefined == _data || null == _data){
+        var result = {
+            errcode :_errcode,
+            msg:err_code[_errcode],
+            ret:_ret
+        };
+    }else{
+        var result = {
+            errcode:_errcode,
+            msg:err_code[_errcode],
+            ret:_ret,
+            data:_data
+        };
+    }
+
+    return result;
+}
+
+
+/**
+ * check table name and json condition ,both can't be null of undefined
+ * @param _tab_name  [table name]
+ * @param _json_con  [json condition]
+ * @param _res       [response Object]
+ * @returns {boolean}
+ */
+function tabnameAndConCheck(_tab_name, _json_con, _res){
+
+    var ret_str = '';
+    //table name can't be null
+    if(_tab_name == undefined || null == _tab_name){
+        ret_str = resFormat(err_code.ERR_DB_NULL_TABNAME, 1, null);
+        _res.send(ret_str);
+        return false;
+    }
+
+    //json condition can't be null neither
+    if(undefined == _json_con || null == _json_con){
+        ret_str = resFormat(err_code.ERR_DB_NULL_CONDITION, 1, null);
+        _res.send(ret_str);
+        return false;
+    }
+
+    return true;
+}
+
+
+/**
+ * check insert or update values
+ * @param _json_values  [json values]
+ * @param _res          [response object]
+ * @returns {boolean}
+ */
+function valuesCheck(_json_values, _res){
+    var ret_str = '';
+    //table name can't be null
+    if(_json_values == undefined || null == _json_values){
+        ret_str = resFormat(err_code.ERR_DB_NULL_VALUES, 1, null);
+        _res.send(ret_str);
+        return false;
+    }
+}
+
+
+/**
+ * get items information from DB
+ * @param _tab_name  [table name]
+ * @param _json_con  [condition JSON]
+ * @param _res   [response Object]
+ * @param _type [get data mode]
+ */
+function getData(_tab_name, _json_con, _res, _type){
+    var ret_str = '';
+
+    //table name can't be null, so does it with condition json
+    if(tabnameAndConCheck(_tab_name, _json_con, _res) == false){
+        return;
+    }else{
+        db.get_data(_tab_name, _json_con, function(results){
+
+            //results's length can't be zero
+            if(results.length == 0){
+                ret_str = resFormat(err_code.ERR_DB_NOT_FIND, 1, null);
+                _res.send(ret_str);
+                return;
+            }else{
+
+                //judge it is single mode or not
+                if(_type == null || _type == undefined || _type == types.SIGLE_MODE){
+                    ret_str = resFormat(err_code.SUCCESS, 0, results[0]);
+                    _res.send(ret_str);
+                    return;
+                }else{
+                    ret_str = resFormat(err_code.SUCCESS, 0, results);
+                    _res.send(ret_str);
+                    return;
+                }
+            }
+        });
+    }
+}
+
+
+/**
+ * get single data from database
+ * @param _tab_name [table name]
+ * @param _json_con [condition condition]
+ * @param _res  [response object]
+ */
+exports.get = function get(_tab_name, _json_con, _res){
+    getData(_tab_name, _json_con, _res, types.SIGLE_MODE);
+}
+
+
+/**
+ * get list of object from database
+ * @param _tab_name
+ * @param _json_con
+ * @param _res
+ */
+exports.list = function list(_tab_name, _json_con, _res){
+    getData(_tab_name, _json_con, _res, types.MULTI_MODE);
+}
+
+
+/**
+ * delete an object from database
+ * @param _tab_name  [table name]
+ * @param _json_con  [json condition]
+ * @param _res       [response object]
+ */
+exports.del = function del(_tab_name, _json_con, _res){
+    var ret_str = '';
+
+    //check table name and json condition, both can't be null or undefined
+    if(tabnameAndConCheck(_tab_name, _json_con, _res) == false){
+        return;
+    }else{
+        db.del_data(_tab_name, _json_con, function(result){
+            if(result != undefined && result.affectedRows > 0){
+                ret_str = resFormat(err_code.SUCCESS, 0, null);
+                _res.send(ret_str);
+                return;
+            }else{
+                ret_str = resFormat(err_code.ERR_DB_DELETE_DATA_FAILED, 0, null);
+                _res.send(ret_str);
+                return;
+            }
+        });
+    }
+}
+
+
+/**
+ * update the object data from database
+ * @param _tab_name   [table name]
+ * @param _json_values [values wait for updating]
+ * @param _json_con    [json condition]
+ * @param _res         [res object]
+ */
+exports.update = function update(_tab_name, _json_values, _json_con, _res){
+    var ret_str = '';
+
+    //check table name and json condition, both can't be null or undefined
+    //check update values, it can't be null or undefined
+    if(tabnameAndConCheck(_tab_name, _json_con, _res) == false ||
+        valuesCheck(_json_values, _res) == false){
+        return;
+    }else{
+        db.upd_data(_tab_name, _json_values, _json_con, function(result){
+            if(result != undefined && result.affectedRows > 0){
+                ret_str = resFormat(err_code.SUCCESS, 0, null);
+                _res.send(ret_str);
+                return;
+            }else{
+                ret_str = resFormat(err_code.ERR_DB_UPDATE_DATA_FAILED, 1, null);
+                _res.send(ret_str);
+                return;
+            }
+        });
+    }
+}
+
+
+/**
+ * insert an object into the database
+ * @param _tab_name     [table name]
+ * @param _json_values  [json values]
+ * @param _res          [response object]
+ */
+exports.add = function insert(_tab_name, _json_values, _res){
+    var ret_str = '';
+    
+    //check table name, can't be null or undefined
+    if(_tab_name == undefined || null == _tab_name){
+        ret_str = resFormat(err_code.ERR_DB_NULL_TABNAME, 1, null);
+        _res.send(ret_str);
+        return;
+    }else if(valuesCheck(_json_values, _res) == false){
+        return;
+    }else{
+        db.ins_data(_tab_name, _json_values, function(result){
+            if(result != undefined && result.affectedRows > 0){
+                ret_str = resFormat(err_code.SUCCESS, 0, null);
+                _res.send(ret_str);
+                return;
+            }else{
+                ret_str = resFormat(err_code.ERR_DB_INSERT_DATA_FAILED, 1, null);
+                _res.send(ret_str);
+                return;
+            }     
+        });
+    }
+}

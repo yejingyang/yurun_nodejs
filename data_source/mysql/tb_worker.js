@@ -9,24 +9,43 @@
 var db = require('./db_common');
 
 
-function getWorkerFromDB(_sql_con, _func){
-    var sql_str = "select * from worker ";
-    sql_str += _sql_con;
-    db.get_data_from_db(sql_str, _func);
+//set worker table name
+var tab_name = "worker";
+
+
+/**
+ * get worker information by the condition string
+ * @param _json_con  [condition string]
+ * @param _func   [callback function]
+ */
+function getWorkerFromDB(_json_con, _func){
+    db.get_data(tab_name, _json_con, _func);
 }
 exports.get_worker_info = getWorkerFromDB;
 
 
+/**
+ * get worker information by the rfid code
+ * @param _rfid  [rfid code]
+ * @param _func   [callback function]
+ */
 function getWorkerInfoByRfid(_rfid, _func){
-    var sql_con = " where rfid='" + _rfid + "'";
-    getWorkerFromDB(sql_con, function(results){
+    var con_map = {rfid:_rfid};
+
+    db.get_data(tab_name, con_map, function(results){
         _func(results[0]);
     });
 }
 exports.get_worker_by_rfid = getWorkerInfoByRfid;
 
-function getWorkerList(_condition, _func){
-    getWorkerFromDB(_condition, _func);
+
+/**
+ * get worker list by condition string
+ * @param _json_con  [condition string]
+ * @param _func   [callback function]
+ */
+function getWorkerList(_json_con, _func){
+    getWorkerFromDB(_json_con, _func);
 }
 exports.get_worker_list = getWorkerList;
 
