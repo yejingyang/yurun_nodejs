@@ -8,6 +8,9 @@
 
 var tab_name = require('../data_source/mysql/db_table_name');
 var common = require('./common');
+var db = resuire('../data_source/mysql/db_common');
+var worker = require('./t_worker');
+var err_code = resuire('./errors');
 
 var table_name = tab_name.DB_MEAT_TRANSMIT;
 
@@ -46,11 +49,90 @@ exports.update = function update(req, res){
 
 
 /**
- * add a new meat transmit record
+ * add a new meat transmit record   [transmit ]
  * @param req
  * @param res
  */
 exports.add = function add(req, res){
-    var json_values = {};
-    common.add(table_name, json_values, res);
+
+    common.get_query_str(req, res, function(info){
+        if(info.check_rfid == undefined ||
+            info.trans_rfid == undefined ||
+            info.barcode == undefined){
+            common.format_msg_send(res, err_code.ERR_PARAMS_NOT_VALID, 1, null);
+            return;
+        }
+
+        var checker_rfid = info.check_rfid;
+        var transporter_rfid = info.trans_rfid;
+        var meat_barcode = info.barcode;
+
+        //get meat info
+        var json_meat_con = {meat_barcode:meat_barcode};
+        db.get_data(tab_name.DB_SLAUGHTER_MEAT, json_meat_con, function(meats){
+            if(meats == undefined || meats.length == 0){
+                common.format_msg_send(res, err_code.ERR_DB_NOT_FIND, 1, null);
+                return;
+            }
+
+            var factory_id = meats[0].factory_id;
+
+            var json_values = {
+                meat_barcode:meat_barcode,
+                transporter_rfid:transporter_rfid,
+                leave_checker_rfid:checker_rfid,
+                from_factory_id:factory_id,
+                leave_time:'now()',
+                upd_time:'now()'
+            };
+
+            common.add(table_name, json_values, res);
+        });
+    });
+}
+
+
+exports.recv_meat = function recvMeat(req, res){
+
+    common.get_query_str(req, res, function(info){
+        if(info.check_rfid == undefined ||
+            info.barcode == undefined){
+            common.format_msg_send(res, err_code.ERR_PARAMS_NOT_VALID, 1, null);
+            return;
+        }
+
+        var checker_rfid = info.check_rfid;
+        var meat_barcode = info.barcode;
+
+        //get meat info
+        var json_meat_con = {meat_barcode:meat_barcode};
+        db.get_data(tab_name.DB_MEAT_TRANSMIT, json_meat_con, function(meats){
+            if(meats == undefined || meats.length == 0){
+                common.format_msg_send(res, err_code.ERR_DB_NOT_FIND, 1, null);
+                return;
+            }
+
+            //get worker info, get factory rfid
+            var json_worker_con = {rfid:checker_rfid};
+            db.get_data(tab_name.DB_WORKER, json_worker_con, function(workers){
+                if(workers == undefined || workers.length == 0){
+                    common.format_msg_send(res, err_code.ERR_DB_NOT_FIND, 1, null);
+                    return;
+                }
+
+                var factory_id = workers[0].factory_id;
+
+                //set update values
+                var json_values = {
+                    arrive_checker_rfid:checker_rfid,
+                    to_factory_id:factory_id,
+                    arrive_time:'now()',
+                    upd_time:'now()'
+                };
+                var json_meat_con = {meat_barcode:meat_barcode};
+                common.update(table_name, json_values, json_meat_con, res);
+                return;
+            });
+        });
+    });
 }

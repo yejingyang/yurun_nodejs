@@ -8,6 +8,10 @@
 
 var tab_name = require('../data_source/mysql/db_table_name');
 var common = require('./common');
+var db = resuire('../data_source/mysql/db_common');
+var worker = require('./t_worker');
+var err_code = resuire('./errors');
+var transmit = require('t_transmit');
 
 var table_name = tab_name.DB_PIG_TRANSMIT;
 
@@ -51,6 +55,33 @@ exports.update = function update(req, res){
  * @param res
  */
 exports.add = function add(req, res){
-    var json_values = {};
-    common.add(table_name, json_values, res);
+    common.get_query_str(req, res, function(info){
+        if(info.rfid == undefined ||
+            info.pig_rfid == undefined ||
+            info.weight == undefined){
+            common.format_msg_send(res, err_code.ERR_PARAMS_NOT_VALID, 1, null);
+        }else{
+            var transmit_rfid = info.rfid;
+            var pig_rfid = info.pig_rfid;
+            var weight = info.weight;
+            //set transmit pig count += 1
+            transmit.pig_count_plus(transmit_rfid, function(result){
+                if(result == undefined || result.affectedRows <= 0){
+                    common.format_msg_send(res, err_code.ERR_DB_UPDATE_DATA_FAILED, 1, null);
+                    return;
+                }else{
+                    //insert values of json format
+                    var json_values = {
+                        transmit_rfid:transmit_rfid,
+                        pig_rfid:pig_rfid,
+                        weight:weight,
+                        is_active:1,
+                        leave_time:'now()',
+                        upd_time:'now'
+                    };
+                    common.add(table_name, json_values, res);
+                }
+            });
+        }
+    });
 }

@@ -9,6 +9,7 @@
 var err_code = resuire('./errors');
 var db = resuire('../data_source/mysql/db_common');
 var types = resuire('./types');
+var querystr = require('querystring');
 
 
 /**
@@ -36,6 +37,20 @@ exports.res_format = function resFormat(_errcode, _ret, _data){
 
     return result;
 }
+
+
+/**
+ * format message and send it to remote client
+ * @param _res
+ * @param _errcode
+ * @param _ret
+ * @param _data
+ */
+exports.format_msg_send = function formatMsgSend( _res,_errcode, _ret, _data){
+    var ret_str = resFormat(_errcode, _ret, _data);
+    _res.send(ret_str);
+}
+
 
 
 /**
@@ -232,4 +247,22 @@ exports.add = function insert(_tab_name, _json_values, _res){
             }     
         });
     }
+}
+
+
+/**
+ * get query string from post message
+ * @param _req [request string object]
+ * @param _res [response Object]
+ * @param _func [callback function]
+ */
+exports.get_query_str = function getQueryString(_req, _res, _func){
+    var info = '';
+    _req.addListener('data', function(chunk){
+        info += chunk;
+    })
+        .addListener('end', function(){
+            info = querystr.parse(info);
+            _func(info);
+        });
 }

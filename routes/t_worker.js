@@ -8,6 +8,7 @@
 
 var tab_name = require('../data_source/mysql/db_table_name');
 var common = require('./common');
+var db = resuire('../data_source/mysql/db_common');
 
 var table_name = tab_name.DB_WORKER;
 
@@ -19,6 +20,17 @@ var table_name = tab_name.DB_WORKER;
 exports.get = function get(req, res){
     var json_con = {rfid:'1234567890aaaaa'};
     common.get(table_name, json_con, res);
+}
+
+
+/**
+ * get worker info by rfid
+ * @param _rfid
+ * @param _func_
+ */
+exports.get_worker = function getWorker(_rfid, _func_){
+    var json_con = {rfid:_rfid};
+    db.get_data(table_name, json_con, _func_);
 }
 
 

@@ -54,3 +54,14 @@ exports.ERR_DB_ = 10024;
 exports[10024] = "";
 exports.ERR_DB_ = 10025;
 exports[10025] = "";
+
+exports.ERR_RFID_NOT_EXIT = 10031;
+exports[10031] = "this rfid is not exits!";
+exports.ERR_PARAMS_NOT_VALID = 10032;
+exports[10032] = "input params not valid!";
+exports.ERR_WEIGHT_COUNT_VALID = 10033;
+exports[10033] = "meat weight count is not valid!";
+exports.ERR_DB_ = 100;
+exports[100] = "";
+exports.ERR_DB_ = 100;
+exports[100] = "";
