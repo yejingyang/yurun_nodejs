@@ -8,16 +8,32 @@
 
 var tab_name = require('../data_source/mysql/db_table_name');
 var common = require('./common');
+var db = require('../data_source/mysql/db_common');
+var err_code = require('./errors');
 
 var table_name = tab_name.DB_DRUG;
+
+
+/**
+ * router separate
+ * @param app
+ */
+module.exports = function(app){
+    //drug info web api
+    app.get('/drugs/:rfid', get);
+    app.get('/drugs', list);
+    app.post('/drugs', add);
+    app.post('/drugs/upd', update);
+}
+
 
 /**
  * get a drug information by rfid
  * @param req
  * @param res
  */
-exports.get = function get(req, res){
-    var json_con = {rfid:''};
+function get(req, res){
+    var json_con = {rfid:req.params.rfid};
     common.get(table_name, json_con, res);
 }
 
@@ -27,7 +43,7 @@ exports.get = function get(req, res){
  * @param req
  * @param res
  */
-exports.list = function list(req, res){
+function list(req, res){
     var json_con = {rfid:''};
     common.list(table_name, json_con, res);
 }
@@ -38,7 +54,7 @@ exports.list = function list(req, res){
  * @param req
  * @param res
  */
-exports.update = function update(req, res){
+function update(req, res){
     var json_values = {};
     var json_con = {};
     common.update(table_name, json_values, json_con, res);
@@ -50,7 +66,7 @@ exports.update = function update(req, res){
  * @param req
  * @param res
  */
-exports.add = function add(req, res){
+function add(req, res){
     var json_values = {};
     common.add(table_name, json_values, res);
 }

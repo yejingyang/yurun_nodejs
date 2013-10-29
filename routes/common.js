@@ -6,9 +6,9 @@
  * To change this template use File | Settings | File Templates.
  */
 
-var err_code = resuire('./errors');
-var db = resuire('../data_source/mysql/db_common');
-var types = resuire('./types');
+var err_code = require('./errors');
+var db = require('../data_source/mysql/db_common');
+var types = require('./types');
 var querystr = require('querystring');
 
 
@@ -19,7 +19,7 @@ var querystr = require('querystring');
  * @param _data [useful data]
  * @returns {{errcode: *, msg: *, ret: *}|{errcode: *, msg: *, ret: *, data: *}}
  */
-exports.res_format = function resFormat(_errcode, _ret, _data){
+function resFormat(_errcode, _ret, _data){
     if(undefined == _data || null == _data){
         var result = {
             errcode :_errcode,
@@ -37,6 +37,7 @@ exports.res_format = function resFormat(_errcode, _ret, _data){
 
     return result;
 }
+exports.res_format = resFormat;
 
 
 /**
@@ -265,4 +266,29 @@ exports.get_query_str = function getQueryString(_req, _res, _func){
             info = querystr.parse(info);
             _func(info);
         });
+}
+
+
+/**
+ * format the date string
+ * @param time
+ * @param format
+ * @returns {*}
+ */
+exports.date_format = function dateFormat(time, format){
+    var o = {
+        "M+" : time.getMonth()+1, //month
+        "d+" : time.getDate(), //day
+        "h+" : time.getHours(), //hour
+        "m+" : time.getMinutes(), //minute
+        "s+" : time.getSeconds(), //second
+        "q+" : Math.floor((time.getMonth()+3)/3), //quarter
+        "S" : time.getMilliseconds() //millisecond
+    };
+    if(/(y+)/.test(format))
+        format=format.replace(RegExp.$1,(time.getFullYear()+"").substr(4- RegExp.$1.length));
+    for(var k in o)
+        if(new RegExp("("+ k +")").test(format))
+            format = format.replace(RegExp.$1,RegExp.$1.length==1? o[k] :("00"+ o[k]).substr((""+ o[k]).length));
+    return format;
 }

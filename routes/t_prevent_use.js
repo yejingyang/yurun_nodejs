@@ -11,12 +11,26 @@ var common = require('./common');
 
 var table_name = tab_name.DB_PREVENT_USE;
 
+
+/**
+ * router separate
+ * @param app
+ */
+module.exports = function(app){
+    //prevent use
+    app.get('/prevent/:id', get);
+    app.get('/prevent', list);
+    app.post('/prevent', add);
+    app.post('/prevent/upd', update);
+}
+
+
 /**
  * get a prevent use record
  * @param req
  * @param res
  */
-exports.get = function get(req, res){
+function get(req, res){
     var json_con = {rfid:''};
     common.get(table_name, json_con, res);
 }
@@ -27,7 +41,7 @@ exports.get = function get(req, res){
  * @param req
  * @param res
  */
-exports.list = function list(req, res){
+function list(req, res){
     var json_con = {rfid:''};
     common.list(table_name, json_con, res);
 }
@@ -38,7 +52,7 @@ exports.list = function list(req, res){
  * @param req
  * @param res
  */
-exports.update = function update(req, res){
+function update(req, res){
     var json_values = {};
     var json_con = {};
     common.update(table_name, json_values, json_con, res);
@@ -50,7 +64,7 @@ exports.update = function update(req, res){
  * @param req
  * @param res
  */
-exports.add = function add(req, res){
+function add(req, res){
     var json_values = {};
     common.add(table_name, json_values, res);
 }

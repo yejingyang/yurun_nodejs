@@ -8,15 +8,32 @@
 
 var tab_name = require('../data_source/mysql/db_table_name');
 var common = require('./common');
+var db = require('../data_source/mysql/db_common');
+var err_code = require('./errors');
+var worker = require('./t_worker');
 
 var table_name = tab_name.DB_PIG;
+
+
+/**
+ * router separate
+ * @param app
+ */
+module.exports = function(app){
+    //pig info web api
+    app.get('/pigs/:rfid', get);
+    app.get('/pigs', list);
+    app.post('/pigs', add);
+    app.post('/pigs/upd', update);
+}
+
 
 /**
  * get a pig info by rfid
  * @param req
  * @param res
  */
-exports.get = function get(req, res){
+function get(req, res){
     var json_con = {rfid:''};
     common.get(table_name, json_con, res);
 }
@@ -27,7 +44,7 @@ exports.get = function get(req, res){
  * @param req
  * @param res
  */
-exports.list = function list(req, res){
+function list(req, res){
     var json_con = {rfid:''};
     common.list(table_name, json_con, res);
 }
@@ -38,7 +55,7 @@ exports.list = function list(req, res){
  * @param req
  * @param res
  */
-exports.update = function update(req, res){
+function update(req, res){
     var json_values = {};
     var json_con = {};
     common.update(table_name, json_values, json_con, res);
@@ -50,7 +67,34 @@ exports.update = function update(req, res){
  * @param req
  * @param res
  */
-exports.add = function add(req, res){
-    var json_values = {};
-    common.add(table_name, json_values, res);
+function add(req, res){
+    common.get_query_str(req, res, function(info){
+        if(info.rfid == undefined ||
+            info.weight == undefined ||
+            info.check_rfid == undefined){
+            common.format_msg_send(res, err_code.ERR_PARAMS_NOT_VALID, 1, null);
+            return;
+        }
+
+        var rfid = info.rfid;
+        var chekcer_rfid = info.check_rfid;
+
+        worker.get_worker(chekcer_rfid, function(workers){
+            if(workers.length <= 0){
+                common.format_msg_send(res, err_code.ERR_DB_NOT_FIND, 1, null);
+                return;
+            }
+
+            var factory_id = workers[0].factory_id;
+            var json_values = {
+                rfid:rfid,
+                factory_id:factory_id,
+                in_weight:info.weight,
+                in_checker_rfid:chekcer_rfid,
+                in_time:'now()',
+                upd_time:'now()'
+            };
+            common.add(table_name, json_values, res);
+        });
+    });
 }

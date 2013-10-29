@@ -8,19 +8,33 @@
 
 var tab_name = require('../data_source/mysql/db_table_name');
 var common = require('./common');
-var db = resuire('../data_source/mysql/db_common');
+var db = require('../data_source/mysql/db_common');
 var worker = require('./t_worker');
-var err_code = resuire('./errors');
-var transmit = require('t_transmit');
+var err_code = require('./errors');
+var transmit = require('./t_transmit');
 
 var table_name = tab_name.DB_PIG_TRANSMIT;
+
+
+/**
+ * router separate
+ * @param app
+ */
+module.exports = function(app){
+    //pig transmit web api
+    app.get('/pigtrans/:id', get);
+    app.get('/pigtrans', list);
+    app.post('/pigtrans', add);
+    app.post('/pigtrans/upd', update);
+}
+
 
 /**
  * get a pig transmit record
  * @param req
  * @param res
  */
-exports.get = function get(req, res){
+function get(req, res){
     var json_con = {rfid:''};
     common.get(table_name, json_con, res);
 }
@@ -31,7 +45,7 @@ exports.get = function get(req, res){
  * @param req
  * @param res
  */
-exports.list = function list(req, res){
+function list(req, res){
     var json_con = {rfid:''};
     common.list(table_name, json_con, res);
 }
@@ -42,7 +56,7 @@ exports.list = function list(req, res){
  * @param req
  * @param res
  */
-exports.update = function update(req, res){
+function update(req, res){
     var json_values = {};
     var json_con = {};
     common.update(table_name, json_values, json_con, res);
@@ -54,7 +68,7 @@ exports.update = function update(req, res){
  * @param req
  * @param res
  */
-exports.add = function add(req, res){
+function add(req, res){
     common.get_query_str(req, res, function(info){
         if(info.rfid == undefined ||
             info.pig_rfid == undefined ||

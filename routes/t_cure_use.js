@@ -12,11 +12,24 @@ var common = require('./common');
 var table_name = tab_name.DB_CURE_USE;
 
 /**
+ * router separate
+ * @param app
+ */
+module.exports = function(app){
+    //cure use web api
+    app.get('/cureuse/:id', get);
+    app.get('/cureuse', list);
+    app.post('/cureuse', add);
+    app.post('/cureuse/upd', update);
+}
+
+
+/**
  *  get a cure record
  * @param req
  * @param res
  */
-exports.get = function get(req, res){
+function get(req, res){
     var json_con = {id:''};
     common.get(table_name, json_con, res);
 }
@@ -27,7 +40,7 @@ exports.get = function get(req, res){
  * @param req
  * @param res
  */
-exports.list = function list(req, res){
+function list(req, res){
     var json_con = {pig_rfid:''};
     common.list(table_name, json_con, res);
 }
@@ -38,7 +51,7 @@ exports.list = function list(req, res){
  * @param req
  * @param res
  */
-exports.update = function update(req, res){
+function update(req, res){
     var json_values = {};
     var json_con = {};
     common.update(table_name, json_values, json_con, res);
@@ -50,7 +63,7 @@ exports.update = function update(req, res){
  * @param req
  * @param res
  */
-exports.add = function add(req, res){
+function add(req, res){
     var json_values = {};
     common.add(table_name, json_values, res);
 }
