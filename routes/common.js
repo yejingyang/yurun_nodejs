@@ -116,7 +116,7 @@ function getData(_tab_name, _json_con, _res, _type){
         db.get_data(_tab_name, _json_con, function(results){
 
             //results's length can't be zero
-            if(results.length == 0){
+            if(results == undefined || results.length == 0){
                 ret_str = resFormat(err_code.ERR_DB_NOT_FIND, 1, null);
                 _res.send(ret_str);
                 return;

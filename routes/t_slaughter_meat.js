@@ -101,7 +101,7 @@ function add(req, res){
                 weight:weight,
                 factory_id:factory_id,
                 checker_rfid:checker_rfid,
-                upd_time:'now()'
+                upd_time:new Date()
             };
 
             db.ins_data(table_name, json_values, function(result){

@@ -105,8 +105,8 @@ function add(req, res){
                 //update it to the table pig_transmit
                 var json_pig_trans_values = {
                     is_active:1,
-                    arrive_time:'now()',
-                    upd_time:'now()'
+                    arrive_time:new Date(),
+                    upd_time:new Date()
                 };
                 var json_pig_trans_con = {pig_rfid:pig_rfid};
                 db.upd_data(tab_name.DB_SLAUGHTER_BATCH, json_pig_trans_values,
@@ -123,7 +123,7 @@ function add(req, res){
                         pig_rfid:pig_rfid,
                         checker_rfid:checker_rfid,
                         factory_id:factory_rfid,
-                        upd_time:'now()'
+                        upd_time:new Date()
                     };
                     common.add(table_name, json_values, res);
                 });

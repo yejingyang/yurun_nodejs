@@ -91,8 +91,8 @@ function add(req, res){
                 factory_id:factory_id,
                 in_weight:info.weight,
                 in_checker_rfid:chekcer_rfid,
-                in_time:'now()',
-                upd_time:'now()'
+                in_time:new Date(),
+                upd_time:new Date()
             };
             common.add(table_name, json_values, res);
         });

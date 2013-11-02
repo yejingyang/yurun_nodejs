@@ -67,6 +67,51 @@ function update(req, res){
  * @param res
  */
 function add(req, res){
-    var json_values = {};
-    common.add(table_name, json_values, res);
+
+    common.get_query_str(req, res, function(info){
+        if(info.NAME == undefined ||
+            info.company_name == undefined ||
+            info.contact_name == undefined ||
+            info.check_rfid == undefined){
+            common.format_msg_send(res, err_code.ERR_PARAMS_NOT_VALID, 1, null);
+            return;
+        }
+
+        var rfid = createDrugRfid();
+        var name = info.NAME;
+        var checker_rfid = info.check_rfid;
+        var company_name = info.company_name;
+        var contact_name = info.contact_name;
+
+        var json_values = {
+            rfid:rfid,
+            NAME:name,
+            drug_desc:info.drug_desc?info.drug_desc:' ',
+            company_name:company_name,
+            contact_name:contact_name,
+            checker_rfid:checker_rfid,
+            upd_time:new Date()
+        };
+
+        db.ins_data(table_name, json_values, function(result){
+            if(result == undefined || result.affectedRows <= 0){
+                common.format_msg_send(res, err_code.ERR_DB_INSERT_DATA_FAILED, 1, null);
+                return;
+            }else{
+                common.format_msg_send(res, err_code.SUCCESS, 0, rfid);
+            }
+        });
+    });
+}
+
+
+/**
+ * create drug rfid
+ * @returns {String}
+ */
+function createDrugRfid(){
+    var time = new Date();
+    var time_str = common.date_format(time, 'yyyMMddhhmmssS');
+
+    return time_str;
 }

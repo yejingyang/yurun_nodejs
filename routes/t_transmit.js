@@ -74,9 +74,7 @@ function add(req, res){
 
     common.get_query_str(req, res, function(info){
         if(info.trans_id == undefined ||
-            info.trans_id == null ||
-            info.check_id == undefined ||
-            info.check_id == null){
+            info.check_id == undefined){
             common.format_msg_send(res, err_code.ERR_PARAMS_NOT_VALID, 1, null);
             return;
         }else{
@@ -97,8 +95,8 @@ function add(req, res){
                         pig_count:0,
                         checker_rfid:checker_rfid,
                         from_factory_id:factory_id,
-                        leave_time:'now()',
-                        upd_time:'now()'
+                        leave_time:new Date(),
+                        upd_time:new Date()
                     };
 
                     db.ins_data(table_name, json_values, function(result){
@@ -119,7 +117,10 @@ function add(req, res){
 
 
 function createRfid(){
-    return '';
+    var time = new Date();
+    var time_str = common.date_format(time, 'yyyMMddhhmmssS');
+
+    return time_str;
 }
 
 

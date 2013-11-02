@@ -96,8 +96,8 @@ function add(req, res){
                 transporter_rfid:transporter_rfid,
                 leave_checker_rfid:checker_rfid,
                 from_factory_id:factory_id,
-                leave_time:'now()',
-                upd_time:'now()'
+                leave_time:new Date(),
+                upd_time:new Date()
             };
 
             common.add(table_name, json_values, res);
@@ -140,8 +140,8 @@ exports.recv_meat = function recvMeat(req, res){
                 var json_values = {
                     arrive_checker_rfid:checker_rfid,
                     to_factory_id:factory_id,
-                    arrive_time:'now()',
-                    upd_time:'now()'
+                    arrive_time:new Date(),
+                    upd_time:new Date()
                 };
                 var json_meat_con = {meat_barcode:meat_barcode};
                 common.update(table_name, json_values, json_meat_con, res);

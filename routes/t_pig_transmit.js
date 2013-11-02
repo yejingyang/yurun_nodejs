@@ -90,8 +90,8 @@ function add(req, res){
                         pig_rfid:pig_rfid,
                         weight:weight,
                         is_active:1,
-                        leave_time:'now()',
-                        upd_time:'now'
+                        leave_time:new Date(),
+                        upd_time:new Date()
                     };
                     common.add(table_name, json_values, res);
                 }

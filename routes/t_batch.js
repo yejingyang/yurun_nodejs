@@ -105,7 +105,7 @@ function add(req, res){
                         transporter_rfid:trans_rfid,
                         factory_id:factory_rfid,
                         checker_rfid:checker_rfid,
-                        upd_time:'now()'
+                        upd_time:new Date()
                     };
 
                     db.ins_data(table_name, json_values, function(result){

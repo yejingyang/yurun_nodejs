@@ -81,9 +81,10 @@ function add(req, res){
             TYPE:info.TYPE,
             tele:info.tele?info.tele:' ',
             factory_desc:info.factory_desc,
-            address:info.address?info.address:' '
+            address:info.address?info.address:' ',
+            upd_time:new Date()
         };
-
+//
         db.ins_data(table_name, json_values, function(result){
             if(result == undefined || result.affectedRows <= 0){
                 common.format_msg_send(res, err_code.ERR_DB_INSERT_DATA_FAILED, 1, null);
