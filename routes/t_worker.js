@@ -44,6 +44,7 @@ function get(req, res){
  * @param _func_
  */
 exports.get_worker = function getWorker(_rfid, _func_){
+    console.log('get worker');
     var json_con = {rfid:_rfid};
     db.get_data(table_name, json_con, _func_);
 };

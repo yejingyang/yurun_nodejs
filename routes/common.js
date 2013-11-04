@@ -258,12 +258,18 @@ exports.add = function insert(_tab_name, _json_values, _res){
  * @param _func [callback function]
  */
 exports.get_query_str = function getQueryString(_req, _res, _func){
+
+    console.log('get query str');
     var info = '';
+//    console.log(_req.url);
     _req.addListener('data', function(chunk){
         info += chunk;
     })
         .addListener('end', function(){
             info = querystr.parse(info);
+
+            console.log('HH')
+            console.log(info.check_id);
             _func(info);
         });
 }

@@ -24,6 +24,7 @@ var firstPage = function(res){
 };
 
 var login = function(req, res) {
+    console.log("fuck23");
     var info ='';
     req.addListener('data', function(chunk){
         info += chunk;
@@ -31,13 +32,17 @@ var login = function(req, res) {
         .addListener('end', function(){
             info = querystring.parse(info);
 
+//            console.log(info.check_id);
+//            console.log(info.trans_id);
             console.log(info.name);
             console.log(info.pwd);
+
             if(info.name == 'a' && info.pwd =='1'){
                 res.end('login success ' + info.name);
             }else{
                 res.end('login failed ' + info.name);
             }
+
         });
 };
 

@@ -13,7 +13,7 @@ var worker = require('./t_worker');
 var err_code = require('./errors');
 
 
-var table_name = tab_name.DB_PIG;
+var table_name = tab_name.DB_TRANSMIT;
 
 
 /**
@@ -69,24 +69,26 @@ function update(req, res){
  * @param res
  */
 function add(req, res){
-    var json_values = {};
-    common.add(table_name, json_values, res);
-
+    console.log("fuck!2");
     common.get_query_str(req, res, function(info){
         if(info.trans_id == undefined ||
             info.check_id == undefined){
+            console.log("fuck1");
             common.format_msg_send(res, err_code.ERR_PARAMS_NOT_VALID, 1, null);
             return;
         }else{
             var transporter_rfid = info.trans_id;
-            var checker_rfid = info.checker_id;
+            var checker_rfid = info.check_id;
 
-            worker.get_worker(checker_rfid, function(results){
-                if(results == undefined || results.length <= 0){
+            console.log(checker_rfid);
+
+            var json_worker = {rfid:checker_rfid};
+            db.get_data(tab_name.DB_WORKER, json_worker, function(workers){
+                if(workers == undefined || workers.length <= 0){
                     common.format_msg_send(res, err_code.ERR_DB_NOT_FIND, 1, null);
                     return;
                 }else{
-                    var factory_id = results[0].factory_id;
+                    var factory_id = workers[0].factory_id;
                     var trans_rfid = createRfid();
 
                     var json_values = {
